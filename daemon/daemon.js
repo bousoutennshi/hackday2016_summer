@@ -65,7 +65,6 @@ Promise.resolve(0).then(function loop(i) {
                 if (stat === 1 && diff_time > 3600) {
                     update_status(connection, user_id, commodity_id, 0);
                 }
-                console.log("It was skipped.");
             }
         });
 
