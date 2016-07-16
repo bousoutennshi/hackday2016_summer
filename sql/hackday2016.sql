@@ -19,5 +19,6 @@ create table commodity_history (
 create table commodity_info (
     commodity_id int NOT NULL,
     commodity_name varchar(255) NOT NULL,
+    full_weight int NOT NULL DEFAULT 0,
     PRIMARY KEY(commodity_id)
 ) ENGINE=innoDB DEFAULT CHARSET=utf8;

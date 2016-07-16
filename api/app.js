@@ -2,11 +2,9 @@
 
 var mysql           = require('mysql2');
 var http            = require('http');
-var async           = require('async');
 var Router          = require('router');
 var finalhandler    = require('finalhandler');
 var compression     = require('compression');
-var url             = require('url');
 var get             = require('./lib/get.js');
 var add             = require('./lib/add.js');
 var update          = require('./lib/update.js');
