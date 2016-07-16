@@ -4,6 +4,7 @@ var mysql   = require('mysql2');
 var async   = require('async');
 var Promise = require('bluebird');
 var mqtt    = require('mqtt');
+var moment  = require("moment");
 
 var connection = mysql.createConnection({
     host : 'localhost',
@@ -43,24 +44,27 @@ Promise.resolve(0).then(function loop(i) {
         ], function (err, results) {
             if (err) throw err;
 
-            // 購入判定処理
+            // 注文判定処理
             var weight = results[0][0].weight;
             var limit_weight = results[1][0].limit_weight;
             var filter = results[1][0].filter;
             var stat = results[1][0].status;
+            var update_time = results[1][0].update_time;
             if (
-                0 < weight && weight < limit_weight &&
-                filter === 'off' &&
-                stat !== 1
+                0 < weight && weight < limit_weight && // 閾値を下回る
+                filter === 'off' && // フィルターがOFFである
+                stat !== 1 // 注文したステータスではない
             ) {
-                // 条件を満たした場合注文トリガーとステータスをUPDATE
-                var sql = "UPDATE user_setting SET status=1 " +
-                    "WHERE user_id = '"+user_id+"' AND commodity_id = "+commodity_id;
-                connection.query(sql + ';', (err, rows, fields) => {
-                    if (err) throw err;
-                });
+                // 条件を満たした場合注文トリガー送信とステータスをUPDATE
+                update_status(connection, user_id, commodity_id, 1);
                 console.log("I sent a mqtt to mythings.");
             } else {
+                // 一定の時間立った場合ステータスをリセット
+                // statusが1になってから1時間以上経過していた場合リセット
+                var diff_time = moment().unix() - moment(update_time).unix();
+                if (stat === 1 && diff_time > 3600) {
+                    update_status(connection, user_id, commodity_id, 0);
+                }
                 console.log("It was skipped.");
             }
         });
@@ -70,3 +74,11 @@ Promise.resolve(0).then(function loop(i) {
     .delay(5000)
     .then(loop);
 });
+
+function update_status (connection, user_id, commodity_id, stat) {
+    var sql = "UPDATE user_setting SET status=" + stat +
+        " WHERE user_id = '"+user_id+"' AND commodity_id = "+commodity_id;
+    connection.query(sql + ';', (err, rows, fields) => {
+        if (err) throw err;
+    });
+}
