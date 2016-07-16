@@ -23,9 +23,9 @@
     "url": "git+ssh://git@github.com/bousoutennshi/hackday2016_summer.git"
   },
   "keywords": [
-    "nodejs"
+    "nodejs","hackday2016"
   ],
-  "author": "myokota",
+  "author": "bousoutennshi",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/bousoutennshi/hackday2016_summer/issues"
