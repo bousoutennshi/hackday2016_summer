@@ -61,7 +61,10 @@ router.get('/get/commodity_history', function (req, res) {
             if (typeof url_parts.query.commodity_id !== 'undefined') {
                 sql = sql + " AND commodity_id = " + url_parts.query.commodity_id;
             }
-            sql = sql + ' ORDER BY update_time DESC LIMIT 10';
+            sql = sql + ' ORDER BY update_time DESC';
+            if (typeof url_parts.query.results !== 'undefined') {
+                sql = sql + " LIMIT " + url_parts.query.results;
+            }
             connection.query(sql + ';', (err, rows, fields) => {
                 if (err) throw err;
 
