@@ -79,5 +79,7 @@ function update_status (connection, user_id, commodity_id, stat) {
         " WHERE user_id = '"+user_id+"' AND commodity_id = "+commodity_id;
     connection.query(sql + ';', (err, rows, fields) => {
         if (err) throw err;
+
+        console.log("update user_setting status : "+stat);
     });
 }
