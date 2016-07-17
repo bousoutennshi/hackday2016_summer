@@ -17,9 +17,12 @@ void setup()
   Serial.print("\n");
 
   spi_init(HSPI);
-  
+  pinMode(0, OUTPUT);
+  digitalWrite(0, HIGH);
   pinMode(4, OUTPUT);
   digitalWrite(4, LOW);
+  pinMode(16, OUTPUT);
+  digitalWrite(16, HIGH);
   Serial.println("Ready...");
 
   WiFi.begin(ssid, pass);
@@ -37,49 +40,39 @@ void setup()
  
 void loop() 
 {
-  delay(5000);
-  
-  //uint32 val0 = check(0);
-
   int channel = 0;
-  uint8 cmd = (0b11 << 3) | channel;
 
-  const uint32 COMMAND_LENGTH = 5;
-  const uint32 RESPONSE_LENGTH = 12;
-
-  uint32 retval = spi_transaction(HSPI, 0, 0, 0, 0, COMMAND_LENGTH, cmd, RESPONSE_LENGTH, 0);
-
-  uint32 val0 = retval & 0x3FF; // mask to 10-bit value  
-  char out[9];
-  itoa(val0, out, 10);
+  int val = analogRead(A0);
+  String out = String(val);
   
   Serial.print("val:");
   Serial.print(out);
   Serial.print("\n");
 
   if (!wclient.connect(host, httpPort)) {
-    digitalWrite(4, HIGH);
+    digitalWrite(4, LOW);
+    digitalWrite(16, HIGH);
     return;
   } else {
-    digitalWrite(4, LOW);
+    digitalWrite(4, HIGH);
+    digitalWrite(16, LOW);
   }
 
+  // insert val
   String url = "/add/commodity_history?user_id=dkawashi&commodity_id=1&weight=";
   url.concat(out);
 
   wclient.print(String("GET ") + url + " HTTP/1.1\r\n" +
                "Host: " + host + "\r\n" +
                "Connection: close\r\n\r\n");
+  /*
+  // get status
+  url = "/get/status?user_id=dkawashi&commodity_id=1";
+  wclient.print(String("GET ") + url + " HTTP/1.1\r\n" +
+               "Host: " + host + "\r\n" +
+               "Connection: close\r\n\r\n");
+               */
+               
+  delay(1000);
+
 } 
-
-uint32 check(int channel) {
-  uint8 cmd = (0b11 << 3) | channel;
-
-  const uint32 COMMAND_LENGTH = 5;
-  const uint32 RESPONSE_LENGTH = 12;
-
-  uint32 retval = spi_transaction(HSPI, 0, 0, 0, 0, COMMAND_LENGTH, cmd, RESPONSE_LENGTH, 0);
-
-  retval = retval & 0x3FF; // mask to 10-bit value
-  return retval;
-}
