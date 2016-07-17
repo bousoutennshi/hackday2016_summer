@@ -39,6 +39,10 @@ router.get('/get/user_setting', function (req, res) {
     get.user_setting(req, res, connection);
 });
 
+router.get('/get/status', function (req, res) {
+    get.status(req, res, connection);
+});
+
 // 登録系
 router.get('/add/commodity_history', function (req, res) {
     add.commodity_history(req, res, connection);

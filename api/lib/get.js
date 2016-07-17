@@ -77,6 +77,31 @@ exports.user_setting = function (req, res, connection) {
     });
 };
 
+exports.status = function (req, res, connection) {
+    async.series([
+        function (callback) {
+            var url_parts = url.parse(req.url,true);
+            var sql = 'SELECT status from user_setting WHERE';
+            if (typeof url_parts.query.user_id !== 'undefined') {
+                sql = sql + " user_id = '" + url_parts.query.user_id + "'";
+            }
+            if (typeof url_parts.query.commodity_id !== 'undefined') {
+                sql = sql + " AND commodity_id = " + url_parts.query.commodity_id;
+            }
+            connection.query(sql + ';', (err, rows, fields) => {
+                if (err) throw err;
+
+                callback(null, rows);
+            });
+        }
+    ], function (err, results) {
+        if (err) throw err;
+
+        res.writeHead(200, {'Content-Type': 'text/plain'});
+        res.end(JSON.stringify(results[0][0].status));
+    });
+};
+
 function output (res, body) {
     res.writeHead(
         200,
