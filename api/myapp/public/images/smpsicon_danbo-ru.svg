@@ -1,0 +1,16 @@
+<!--?xml version="1.0" encoding="utf-8"?-->
+<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg version="1.1" id="_x32_" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style="width: 200px; height: 200px; opacity: 1;" xml:space="preserve">
+	<style type="text/css">
+	</style>
+	<g id="danbo-ru">
+		<clipPath id="mask_danbo-ru">
+			<path class="st0" d="M424.496,6.194H87.5L0,160.347v4.363v341.097h512v-345.46L424.496,6.194z"></path>
+		</clipPath>
+		<rect id="amountBg" clip-path="url(#mask_danbo-ru)" x="0" y="0" width="512" height="512" fill="#3498db"></rect>
+		<path class="st0" d="M424.496,6.194H87.5L0,160.347v4.363v341.097h512v-345.46L424.496,6.194z M466.451,147.016H268.387V39.226 H405.27L466.451,147.016z M106.73,39.226h136.883v107.79H45.544L106.73,39.226z M33.032,472.774V171.79h445.935v300.984H33.032z" style="fill: rgb(75, 75, 75);"></path>
+		<path class="st0" d="M303.484,233.29h-94.968c-9.694,0-17.548,7.855-17.548,17.548s7.854,17.548,17.548,17.548h94.968 c9.693,0,17.548-7.855,17.548-17.548S313.177,233.29,303.484,233.29z" style="fill: rgb(75, 75, 75);"></path>
+	</g>
+</svg>
+

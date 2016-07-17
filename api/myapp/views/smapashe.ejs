@@ -1,0 +1,81 @@
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <title>サンプル</title>
+        <style type="text/css">
+        </style>
+	<script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+	<script>
+$(document).ready(function(){
+	$('#commodity2').load('images/smpsicon_danbo-ru.svg',   function() {});
+	$('#commodity1').load('images/smpsicon_petbottle.svg',  function() {});
+	$('#commodity0').load('images/smpsicon_senzai.svg', function() {
+		var amountNow = 0;
+		var timerID = window.setInterval(function(){
+                        $.ajax({ type:'get',dataType:'json',url:'http://210-140-101-90.jp-east.compute.idcfcloud.com:8080/get/commodity_info/?commodity_id=1'}
+			).done(function (response) {
+				var commodity = response[0];
+				var weightF = commodity.full_weight;
+
+				$.ajax({ type:'get',dataType:'json',url:'http://210-140-101-90.jp-east.compute.idcfcloud.com:8080/get/commodity_history?user_id=dkawashi&commodity_id=1' }
+                        	).done(function (response) {
+                                	var commodityStatus = response[0];
+                                	var weight = commodityStatus.weight;    // 0-1023
+					var amount = ((weight / weightF) > 1) ? 1.01 : (weight / weightF);
+					amountNow = amount;	
+                         	        var objectH = 512 * amount;
+                                	var objectY = 512 - objectH;
+
+                                	$('#commodity0').find('#HogeamountBg').attr('y', objectY);
+                                	$('#commodity0').find('#HogeamountBg').attr('height', objectH);
+					$('#commodity0ammount').text( Math.round( amount * 100 ) + "%" );
+      	                        }).fail(function(){
+                        		//clearInterval(timerID);
+				});
+			}).fail(function(){
+                                //clearInterval(timerID);
+                        });
+			
+			$.ajax({ type:'get',dataType:'json',url:'http://210-140-101-90.jp-east.compute.idcfcloud.com:8080/get/user_setting?user_id=dkawashi&commodity_id=1' }
+			).done(function (response) {
+				var commodityStatus = response[0];
+				var status = commodityStatus.status;
+				
+				$('#commodity0status').text( (status === 1) ? "注文しといたよ！" : "まだ注文しないよ" );
+			}).fail(function(){
+				//clearInterval(timerID);
+			});
+			
+                }, 1*1000);
+        });
+});
+        </script>
+    </head>
+    <body>
+	<div style="position:absolute;top:250px;left:50%;margin-left:-480px;width:960px;height:450px;">
+		<table style="width:100%;height:100%;text-align:center;">
+			<tr>
+				<th style="background:rgb(199,199,199);">スマパシID: A</ht>
+				<th style="background:rgb(199,199,199);">スマパシID: B</ht>
+				<th style="background:rgb(199,199,199);">スマパシID: C</ht>
+			</tr>
+			<tr>
+				<td><div id="commodity0"></div></td>
+				<td><div id="commodity1"></div></td>
+				<td><div id="commodity2"></div></td>
+			</tr>
+			<tr>
+				<td id="commodity0ammount" style="font-size:1.5em;">100%</td>
+				<td id="commodity1ammount" style="font-size:1.5em;">100%</td>
+				<td id="commodity2ammount" style="font-size:1.5em;">100%</td>
+			</tr>
+			<tr>
+				<td id="commodity0status" style="font-size:1.2em;">まだ注文しないよ</td>
+				<td id="commodity1status" style="font-size:1.2em;">まだ注文しないよ</td>
+				<td id="commodity2status" style="font-size:1.2em;">まだ注文しないよ</td>
+			</tr>
+		</table>
+	</div>
+	<img src="images/lohaco_smapashe.png" style="display:block;margin:auto;" />
+    </body>
+</html>

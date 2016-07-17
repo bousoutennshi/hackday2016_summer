@@ -51,7 +51,7 @@ Promise.resolve(0).then(function loop(i) {
             var stat = results[1][0].status;
             var update_time = results[1][0].update_time;
             if (
-                0 < weight && weight < limit_weight && // 閾値を下回る
+                20 < weight && weight < limit_weight && // 閾値を下回る
                 filter === 'off' && // フィルターがOFFである
                 stat !== 1 // 注文したステータスではない
             ) {
@@ -62,7 +62,7 @@ Promise.resolve(0).then(function loop(i) {
                 // 一定の時間立った場合ステータスをリセット
                 // statusが1になってから1時間以上経過していた場合リセット
                 var diff_time = moment().unix() - moment(update_time).unix();
-                if (stat === 1 && diff_time > 3600) {
+                if (stat === 1 && diff_time > 10) {
                     update_status(connection, user_id, commodity_id, 0);
                 }
             }

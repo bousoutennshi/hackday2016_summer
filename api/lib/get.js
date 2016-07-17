@@ -41,14 +41,13 @@ exports.commodity_history = function (req, res, connection) {
             connection.query(sql + ';', (err, rows, fields) => {
                 if (err) throw err;
 
-                var json = JSON.stringify(rows);
-                callback(null, json);
+                callback(null, rows);
             });
         }
     ], function (err, results) {
         if (err) throw err;
 
-        output(res, results[0]);
+        output(res, JSON.stringify(results[0]));
     });
 };
 
