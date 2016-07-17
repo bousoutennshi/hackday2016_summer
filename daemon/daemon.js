@@ -3,7 +3,7 @@
 var mysql   = require('mysql2');
 var async   = require('async');
 var Promise = require('bluebird');
-var mqtt    = require('mqtt');
+var request = require('request');
 var moment  = require("moment");
 
 var connection = mysql.createConnection({
@@ -51,18 +51,29 @@ Promise.resolve(0).then(function loop(i) {
             var stat = results[1][0].status;
             var update_time = results[1][0].update_time;
             if (
-                20 < weight && weight < limit_weight && // 閾値を下回る
+                50 < weight && weight < limit_weight && // 閾値を下回る
                 filter === 'off' && // フィルターがOFFである
                 stat !== 1 // 注文したステータスではない
             ) {
                 // 条件を満たした場合注文トリガー送信とステータスをUPDATE
-                update_status(connection, user_id, commodity_id, 1);
-                console.log("I sent a mqtt to mythings.");
+                var headers = {
+                    'meshblu_auth_uuid': 'db71a3fe-0fc9-45ef-bb0b-8f19a90e25a1',
+                    'meshblu_auth_token': 'ea45b69a'
+                };
+                var options = {
+                    url: 'http://210.140.83.12/data/db71a3fe-0fc9-45ef-bb0b-8f19a90e25a1',
+                    headers: headers,
+                    form: {key:'value'}
+                };
+                request.post(options, function (error, response, body) {
+                    update_status(connection, user_id, commodity_id, 1);
+                    console.log("I post to mythings. user_id : "+user_id+" commodity_id : "+commodity_id);
+                });
             } else {
                 // 一定の時間立った場合ステータスをリセット
                 // statusが1になってから1時間以上経過していた場合リセット
                 var diff_time = moment().unix() - moment(update_time).unix();
-                if (stat === 1 && diff_time > 10) {
+                if (stat === 1 && diff_time > 300) {
                     update_status(connection, user_id, commodity_id, 0);
                 }
             }

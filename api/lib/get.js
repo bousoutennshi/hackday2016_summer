@@ -97,7 +97,8 @@ exports.status = function (req, res, connection) {
         if (err) throw err;
 
         res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.end(JSON.stringify(results[0][0].status));
+        var json = { status : results[0][0].status };
+        res.end(JSON.stringify(json));
     });
 };
 

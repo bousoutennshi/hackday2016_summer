@@ -10,10 +10,15 @@ exports.commodity_history = function (req, res, connection) {
             var vo = ain / 1023;
             var rf = (3.3*5)/vo - 15;
             var weight = 24.176*Math.pow(2.718,8.7241*(1/rf));
+            weight = weight.toFixed(0);
+            weight = weight - 24; // 皿の重さを引く
+            if (weight < 0) {
+                weight = 0;
+            }
             var sql = 'INSERT INTO commodity_history (user_id, commodity_id, weight) values (' +
                 "'" + url_parts.query.user_id + "'," +
                 url_parts.query.commodity_id + "," +
-                weight.toFixed(0) + ')';
+                weight + ')';
             connection.query(sql + ';', (err, rows, fields) => {
                 if (err) throw err;
 
