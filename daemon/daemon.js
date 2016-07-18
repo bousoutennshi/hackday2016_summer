@@ -50,38 +50,47 @@ Promise.resolve(0).then(function loop(i) {
             var filter = results[1][0].filter;
             var stat = results[1][0].status;
             var update_time = results[1][0].update_time;
+            var counter = results[1][0].counter;
             if (
-                50 < weight && weight < limit_weight && // 閾値を下回る
+                25 < weight && weight < limit_weight && // 閾値を下回る
                 filter === 'off' && // フィルターがOFFである
                 stat !== 1 // 注文したステータスではない
             ) {
-                // 条件を満たした場合注文トリガー送信とステータスをUPDATE
-                var headers = {
-                    'meshblu_auth_uuid': 'db71a3fe-0fc9-45ef-bb0b-8f19a90e25a1',
-                    'meshblu_auth_token': 'ea45b69a'
-                };
-                var options = {
-                    url: 'http://210.140.83.12/data/db71a3fe-0fc9-45ef-bb0b-8f19a90e25a1',
-                    headers: headers,
-                    form: {key:'value'}
-                };
-                request.post(options, function (error, response, body) {
-                    update_status(connection, user_id, commodity_id, 1);
-                    console.log("I post to mythings. user_id : "+user_id+" commodity_id : "+commodity_id);
-                });
+                if (counter === 2) {
+                    // 条件を満たした場合注文トリガー送信とステータスをUPDATE
+                    var headers = {
+                        'meshblu_auth_uuid': 'db71a3fe-0fc9-45ef-bb0b-8f19a90e25a1',
+                        'meshblu_auth_token': 'ea45b69a'
+                    };
+                    var options = {
+                        url: 'http://210.140.83.12/data/db71a3fe-0fc9-45ef-bb0b-8f19a90e25a1',
+                        headers: headers,
+                        form: {key:'value'}
+                    };
+                    request.post(options, function (error, response, body) {
+                        update_status(connection, user_id, commodity_id, 1);
+                        update_counter(connection, user_id, commodity_id, 0);
+                        console.log("I post to mythings. user_id : "+user_id+" commodity_id : "+commodity_id);
+                    });
+                } else {
+                    counter = counter + 1;
+                    update_counter(connection, user_id, commodity_id, counter);
+                }
             } else {
-                // 一定の時間立った場合ステータスをリセット
-                // statusが1になってから1時間以上経過していた場合リセット
-                var diff_time = moment().unix() - moment(update_time).unix();
-                if (stat === 1 && diff_time > 300) {
+                // 制限の重さ以上の物が置かれた場合ステータスをリセット
+                if (weight > limit_weight) {
                     update_status(connection, user_id, commodity_id, 0);
+                    update_counter(connection, user_id, commodity_id, 0);
+                }
+                if (25 > weight) {
+                    update_counter(connection, user_id, commodity_id, 0);
                 }
             }
         });
 
         resolve(i+1);
     })
-    .delay(5000)
+    .delay(2000)
     .then(loop);
 });
 
@@ -92,5 +101,15 @@ function update_status (connection, user_id, commodity_id, stat) {
         if (err) throw err;
 
         console.log("update user_setting status : "+stat);
+    });
+}
+
+function update_counter (connection, user_id, commodity_id, counter) {
+    var sql = "UPDATE user_setting SET counter=" + counter +
+        " WHERE user_id = '"+user_id+"' AND commodity_id = "+commodity_id;
+    connection.query(sql + ';', (err, rows, fields) => {
+        if (err) throw err;
+
+        console.log("update user_setting counter : "+counter);
     });
 }
